@@ -1,0 +1,970 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"au",
+				"auth_views"
+			],
+			[
+				"as",
+				"as_view"
+			],
+			[
+				"d",
+				"djangoproject"
+			],
+			[
+				"for",
+				"form"
+			],
+			[
+				"R",
+				"RestaurantCreateView"
+			],
+			[
+				"re",
+				"return"
+			],
+			[
+				"in",
+				"instance"
+			],
+			[
+				"fo",
+				"form"
+			],
+			[
+				"se",
+				"settings"
+			],
+			[
+				"h",
+				"h1	Tag"
+			],
+			[
+				"val",
+				"validate_category"
+			],
+			[
+				"va",
+				"validate_category"
+			],
+			[
+				"b",
+				"button	Tag"
+			],
+			[
+				"f",
+				"form	Tag"
+			],
+			[
+				"c",
+				"Charfield"
+			],
+			[
+				"N",
+				"NOT_USABLE"
+			],
+			[
+				"u",
+				"unique_slug_generator"
+			],
+			[
+				"rl_",
+				"rl_pre_save"
+			],
+			[
+				"Re",
+				"RestaurantLocation"
+			],
+			[
+				"ge",
+				"get_object_or_404"
+			],
+			[
+				"res",
+				"rest_id"
+			],
+			[
+				"a",
+				"all"
+			],
+			[
+				"de",
+				"default"
+			],
+			[
+				"m",
+				"max_length"
+			],
+			[
+				"C",
+				"CharField"
+			],
+			[
+				"M",
+				"models"
+			],
+			[
+				"Ho",
+				"HomeView"
+			],
+			[
+				"A",
+				"AboutView"
+			],
+			[
+				"tem",
+				"template_name"
+			],
+			[
+				"vi",
+				"views"
+			],
+			[
+				"Con",
+				"ContactView"
+			],
+			[
+				"s",
+				"some_ages"
+			],
+			[
+				"ht",
+				"html_"
+			],
+			[
+				"fu",
+				"function"
+			],
+			[
+				"ro",
+				"roll_individual_character"
+			],
+			[
+				"v",
+				"vroll"
+			],
+			[
+				"onc",
+				"onclick	Attr"
+			],
+			[
+				"o",
+				"option	Tag"
+			],
+			[
+				"T",
+				"type	Attr"
+			],
+			[
+				"on",
+				"onclick	Attr"
+			],
+			[
+				"op",
+				"operator"
+			],
+			[
+				"g",
+				"getElementById"
+			],
+			[
+				"i",
+				"id	Attr"
+			],
+			[
+				"t",
+				"type	Attr"
+			],
+			[
+				"te",
+				"template_name"
+			],
+			[
+				"con",
+				"context"
+			],
+			[
+				"H",
+				"HomeView"
+			],
+			[
+				"Co",
+				"ContactView"
+			],
+			[
+				"cont",
+				"context"
+			],
+			[
+				"l",
+				"li	Tag"
+			],
+			[
+				"sc",
+				"scripts"
+			],
+			[
+				"B",
+				"BASE_DIR"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"file": "src/cfehome/urls.py",
+			"settings":
+			{
+				"buffer_size": 1390,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"contents": "import functools\nimport warnings\n\nfrom django.conf import settings\n# Avoid shadowing the login() and logout() views below.\nfrom django.contrib.auth import (\n    REDIRECT_FIELD_NAME, get_user_model, login as auth_login,\n    logout as auth_logout, update_session_auth_hash,\n)\nfrom django.contrib.auth.decorators import login_required\nfrom django.contrib.auth.forms import (\n    AuthenticationForm, PasswordChangeForm, PasswordResetForm, SetPasswordForm,\n)\nfrom django.contrib.auth.tokens import default_token_generator\nfrom django.contrib.sites.shortcuts import get_current_site\nfrom django.http import HttpResponseRedirect, QueryDict\nfrom django.shortcuts import resolve_url\nfrom django.template.response import TemplateResponse\nfrom django.urls import reverse, reverse_lazy\nfrom django.utils.decorators import method_decorator\nfrom django.utils.deprecation import (\n    RemovedInDjango20Warning, RemovedInDjango21Warning,\n)\nfrom django.utils.encoding import force_text\nfrom django.utils.http import is_safe_url, urlsafe_base64_decode\nfrom django.utils.six.moves.urllib.parse import urlparse, urlunparse\nfrom django.utils.translation import ugettext_lazy as _\nfrom django.views.decorators.cache import never_cache\nfrom django.views.decorators.csrf import csrf_protect\nfrom django.views.decorators.debug import sensitive_post_parameters\nfrom django.views.generic.base import TemplateView\nfrom django.views.generic.edit import FormView\n\nUserModel = get_user_model()\n\n\ndef deprecate_current_app(func):\n    \"\"\"\n    Handle deprecation of the current_app parameter of the views.\n    \"\"\"\n    @functools.wraps(func)\n    def inner(*args, **kwargs):\n        if 'current_app' in kwargs:\n            warnings.warn(\n                \"Passing `current_app` as a keyword argument is deprecated. \"\n                \"Instead the caller of `{0}` should set \"\n                \"`request.current_app`.\".format(func.__name__),\n                RemovedInDjango20Warning\n            )\n            current_app = kwargs.pop('current_app')\n            request = kwargs.get('request', None)\n            if request and current_app is not None:\n                request.current_app = current_app\n        return func(*args, **kwargs)\n    return inner\n\n\nclass SuccessURLAllowedHostsMixin(object):\n    success_url_allowed_hosts = set()\n\n    def get_success_url_allowed_hosts(self):\n        allowed_hosts = {self.request.get_host()}\n        allowed_hosts.update(self.success_url_allowed_hosts)\n        return allowed_hosts\n\n\nclass LoginView(SuccessURLAllowedHostsMixin, FormView):\n    \"\"\"\n    Displays the login form and handles the login action.\n    \"\"\"\n    form_class = AuthenticationForm\n    authentication_form = None\n    redirect_field_name = REDIRECT_FIELD_NAME\n    template_name = 'registration/login.html'\n    redirect_authenticated_user = False\n    extra_context = None\n\n    @method_decorator(sensitive_post_parameters())\n    @method_decorator(csrf_protect)\n    @method_decorator(never_cache)\n    def dispatch(self, request, *args, **kwargs):\n        if self.redirect_authenticated_user and self.request.user.is_authenticated:\n            redirect_to = self.get_success_url()\n            if redirect_to == self.request.path:\n                raise ValueError(\n                    \"Redirection loop for authenticated user detected. Check that \"\n                    \"your LOGIN_REDIRECT_URL doesn't point to a login page.\"\n                )\n            return HttpResponseRedirect(redirect_to)\n        return super(LoginView, self).dispatch(request, *args, **kwargs)\n\n    def get_success_url(self):\n        \"\"\"Ensure the user-originating redirection URL is safe.\"\"\"\n        redirect_to = self.request.POST.get(\n            self.redirect_field_name,\n            self.request.GET.get(self.redirect_field_name, '')\n        )\n        url_is_safe = is_safe_url(\n            url=redirect_to,\n            allowed_hosts=self.get_success_url_allowed_hosts(),\n            require_https=self.request.is_secure(),\n        )\n        if not url_is_safe:\n            return resolve_url(settings.LOGIN_REDIRECT_URL)\n        return redirect_to\n\n    def get_form_class(self):\n        return self.authentication_form or self.form_class\n\n    def get_form_kwargs(self):\n        kwargs = super(LoginView, self).get_form_kwargs()\n        kwargs['request'] = self.request\n        return kwargs\n\n    def form_valid(self, form):\n        \"\"\"Security check complete. Log the user in.\"\"\"\n        auth_login(self.request, form.get_user())\n        return HttpResponseRedirect(self.get_success_url())\n\n    def get_context_data(self, **kwargs):\n        context = super(LoginView, self).get_context_data(**kwargs)\n        current_site = get_current_site(self.request)\n        context.update({\n            self.redirect_field_name: self.get_success_url(),\n            'site': current_site,\n            'site_name': current_site.name,\n        })\n        if self.extra_context is not None:\n            context.update(self.extra_context)\n        return context\n\n\n@deprecate_current_app\ndef login(request, *args, **kwargs):\n    warnings.warn(\n        'The login() view is superseded by the class-based LoginView().',\n        RemovedInDjango21Warning, stacklevel=2\n    )\n    return LoginView.as_view(**kwargs)(request, *args, **kwargs)\n\n\nclass LogoutView(SuccessURLAllowedHostsMixin, TemplateView):\n    \"\"\"\n    Logs out the user and displays 'You are logged out' message.\n    \"\"\"\n    next_page = None\n    redirect_field_name = REDIRECT_FIELD_NAME\n    template_name = 'registration/logged_out.html'\n    extra_context = None\n\n    @method_decorator(never_cache)\n    def dispatch(self, request, *args, **kwargs):\n        auth_logout(request)\n        next_page = self.get_next_page()\n        if next_page:\n            # Redirect to this page until the session has been cleared.\n            return HttpResponseRedirect(next_page)\n        return super(LogoutView, self).dispatch(request, *args, **kwargs)\n\n    def get_next_page(self):\n        if self.next_page is not None:\n            next_page = resolve_url(self.next_page)\n        elif settings.LOGOUT_REDIRECT_URL:\n            next_page = resolve_url(settings.LOGOUT_REDIRECT_URL)\n        else:\n            next_page = self.next_page\n\n        if (self.redirect_field_name in self.request.POST or\n                self.redirect_field_name in self.request.GET):\n            next_page = self.request.POST.get(\n                self.redirect_field_name,\n                self.request.GET.get(self.redirect_field_name)\n            )\n            url_is_safe = is_safe_url(\n                url=next_page,\n                allowed_hosts=self.get_success_url_allowed_hosts(),\n                require_https=self.request.is_secure(),\n            )\n            # Security check -- Ensure the user-originating redirection URL is\n            # safe.\n            if not url_is_safe:\n                next_page = self.request.path\n        return next_page\n\n    def get_context_data(self, **kwargs):\n        context = super(LogoutView, self).get_context_data(**kwargs)\n        current_site = get_current_site(self.request)\n        context.update({\n            'site': current_site,\n            'site_name': current_site.name,\n            'title': _('Logged out'),\n        })\n        if self.extra_context is not None:\n            context.update(self.extra_context)\n        return context\n\n\n@deprecate_current_app\ndef logout(request, *args, **kwargs):\n    warnings.warn(\n        'The logout() view is superseded by the class-based LogoutView().',\n        RemovedInDjango21Warning, stacklevel=2\n    )\n    return LogoutView.as_view(**kwargs)(request, *args, **kwargs)\n\n\n_sentinel = object()\n\n\n@deprecate_current_app\ndef logout_then_login(request, login_url=None, extra_context=_sentinel):\n    \"\"\"\n    Logs out the user if they are logged in. Then redirects to the log-in page.\n    \"\"\"\n    if extra_context is not _sentinel:\n        warnings.warn(\n            \"The unused `extra_context` parameter to `logout_then_login` \"\n            \"is deprecated.\", RemovedInDjango21Warning\n        )\n\n    if not login_url:\n        login_url = settings.LOGIN_URL\n    login_url = resolve_url(login_url)\n    return LogoutView.as_view(next_page=login_url)(request)\n\n\ndef redirect_to_login(next, login_url=None,\n                      redirect_field_name=REDIRECT_FIELD_NAME):\n    \"\"\"\n    Redirects the user to the login page, passing the given 'next' page\n    \"\"\"\n    resolved_url = resolve_url(login_url or settings.LOGIN_URL)\n\n    login_url_parts = list(urlparse(resolved_url))\n    if redirect_field_name:\n        querystring = QueryDict(login_url_parts[4], mutable=True)\n        querystring[redirect_field_name] = next\n        login_url_parts[4] = querystring.urlencode(safe='/')\n\n    return HttpResponseRedirect(urlunparse(login_url_parts))\n\n\n# 4 views for password reset:\n# - password_reset sends the mail\n# - password_reset_done shows a success message for the above\n# - password_reset_confirm checks the link the user clicked and\n#   prompts for a new password\n# - password_reset_complete shows a success message for the above\n\n@deprecate_current_app\n@csrf_protect\ndef password_reset(request,\n                   template_name='registration/password_reset_form.html',\n                   email_template_name='registration/password_reset_email.html',\n                   subject_template_name='registration/password_reset_subject.txt',\n                   password_reset_form=PasswordResetForm,\n                   token_generator=default_token_generator,\n                   post_reset_redirect=None,\n                   from_email=None,\n                   extra_context=None,\n                   html_email_template_name=None,\n                   extra_email_context=None):\n    warnings.warn(\"The password_reset() view is superseded by the \"\n                  \"class-based PasswordResetView().\",\n                  RemovedInDjango21Warning, stacklevel=2)\n    if post_reset_redirect is None:\n        post_reset_redirect = reverse('password_reset_done')\n    else:\n        post_reset_redirect = resolve_url(post_reset_redirect)\n    if request.method == \"POST\":\n        form = password_reset_form(request.POST)\n        if form.is_valid():\n            opts = {\n                'use_https': request.is_secure(),\n                'token_generator': token_generator,\n                'from_email': from_email,\n                'email_template_name': email_template_name,\n                'subject_template_name': subject_template_name,\n                'request': request,\n                'html_email_template_name': html_email_template_name,\n                'extra_email_context': extra_email_context,\n            }\n            form.save(**opts)\n            return HttpResponseRedirect(post_reset_redirect)\n    else:\n        form = password_reset_form()\n    context = {\n        'form': form,\n        'title': _('Password reset'),\n    }\n    if extra_context is not None:\n        context.update(extra_context)\n\n    return TemplateResponse(request, template_name, context)\n\n\n@deprecate_current_app\ndef password_reset_done(request,\n                        template_name='registration/password_reset_done.html',\n                        extra_context=None):\n    warnings.warn(\"The password_reset_done() view is superseded by the \"\n                  \"class-based PasswordResetDoneView().\",\n                  RemovedInDjango21Warning, stacklevel=2)\n    context = {\n        'title': _('Password reset sent'),\n    }\n    if extra_context is not None:\n        context.update(extra_context)\n\n    return TemplateResponse(request, template_name, context)\n\n\n# Doesn't need csrf_protect since no-one can guess the URL\n@sensitive_post_parameters()\n@never_cache\n@deprecate_current_app\ndef password_reset_confirm(request, uidb64=None, token=None,\n                           template_name='registration/password_reset_confirm.html',\n                           token_generator=default_token_generator,\n                           set_password_form=SetPasswordForm,\n                           post_reset_redirect=None,\n                           extra_context=None):\n    \"\"\"\n    View that checks the hash in a password reset link and presents a\n    form for entering a new password.\n    \"\"\"\n    warnings.warn(\"The password_reset_confirm() view is superseded by the \"\n                  \"class-based PasswordResetConfirmView().\",\n                  RemovedInDjango21Warning, stacklevel=2)\n    assert uidb64 is not None and token is not None  # checked by URLconf\n    if post_reset_redirect is None:\n        post_reset_redirect = reverse('password_reset_complete')\n    else:\n        post_reset_redirect = resolve_url(post_reset_redirect)\n    try:\n        # urlsafe_base64_decode() decodes to bytestring on Python 3\n        uid = force_text(urlsafe_base64_decode(uidb64))\n        user = UserModel._default_manager.get(pk=uid)\n    except (TypeError, ValueError, OverflowError, UserModel.DoesNotExist):\n        user = None\n\n    if user is not None and token_generator.check_token(user, token):\n        validlink = True\n        title = _('Enter new password')\n        if request.method == 'POST':\n            form = set_password_form(user, request.POST)\n            if form.is_valid():\n                form.save()\n                return HttpResponseRedirect(post_reset_redirect)\n        else:\n            form = set_password_form(user)\n    else:\n        validlink = False\n        form = None\n        title = _('Password reset unsuccessful')\n    context = {\n        'form': form,\n        'title': title,\n        'validlink': validlink,\n    }\n    if extra_context is not None:\n        context.update(extra_context)\n\n    return TemplateResponse(request, template_name, context)\n\n\n@deprecate_current_app\ndef password_reset_complete(request,\n                            template_name='registration/password_reset_complete.html',\n                            extra_context=None):\n    warnings.warn(\"The password_reset_complete() view is superseded by the \"\n                  \"class-based PasswordResetCompleteView().\",\n                  RemovedInDjango21Warning, stacklevel=2)\n    context = {\n        'login_url': resolve_url(settings.LOGIN_URL),\n        'title': _('Password reset complete'),\n    }\n    if extra_context is not None:\n        context.update(extra_context)\n\n    return TemplateResponse(request, template_name, context)\n\n\n# Class-based password reset views\n# - PasswordResetView sends the mail\n# - PasswordResetDoneView shows a success message for the above\n# - PasswordResetConfirmView checks the link the user clicked and\n#   prompts for a new password\n# - PasswordResetCompleteView shows a success message for the above\n\nclass PasswordContextMixin(object):\n    extra_context = None\n\n    def get_context_data(self, **kwargs):\n        context = super(PasswordContextMixin, self).get_context_data(**kwargs)\n        context['title'] = self.title\n        if self.extra_context is not None:\n            context.update(self.extra_context)\n        return context\n\n\nclass PasswordResetView(PasswordContextMixin, FormView):\n    email_template_name = 'registration/password_reset_email.html'\n    extra_email_context = None\n    form_class = PasswordResetForm\n    from_email = None\n    html_email_template_name = None\n    subject_template_name = 'registration/password_reset_subject.txt'\n    success_url = reverse_lazy('password_reset_done')\n    template_name = 'registration/password_reset_form.html'\n    title = _('Password reset')\n    token_generator = default_token_generator\n\n    @method_decorator(csrf_protect)\n    def dispatch(self, *args, **kwargs):\n        return super(PasswordResetView, self).dispatch(*args, **kwargs)\n\n    def form_valid(self, form):\n        opts = {\n            'use_https': self.request.is_secure(),\n            'token_generator': self.token_generator,\n            'from_email': self.from_email,\n            'email_template_name': self.email_template_name,\n            'subject_template_name': self.subject_template_name,\n            'request': self.request,\n            'html_email_template_name': self.html_email_template_name,\n            'extra_email_context': self.extra_email_context,\n        }\n        form.save(**opts)\n        return super(PasswordResetView, self).form_valid(form)\n\n\nINTERNAL_RESET_URL_TOKEN = 'set-password'\nINTERNAL_RESET_SESSION_TOKEN = '_password_reset_token'\n\n\nclass PasswordResetDoneView(PasswordContextMixin, TemplateView):\n    template_name = 'registration/password_reset_done.html'\n    title = _('Password reset sent')\n\n\nclass PasswordResetConfirmView(PasswordContextMixin, FormView):\n    form_class = SetPasswordForm\n    post_reset_login = False\n    post_reset_login_backend = None\n    success_url = reverse_lazy('password_reset_complete')\n    template_name = 'registration/password_reset_confirm.html'\n    title = _('Enter new password')\n    token_generator = default_token_generator\n\n    @method_decorator(sensitive_post_parameters())\n    @method_decorator(never_cache)\n    def dispatch(self, *args, **kwargs):\n        assert 'uidb64' in kwargs and 'token' in kwargs\n\n        self.validlink = False\n        self.user = self.get_user(kwargs['uidb64'])\n\n        if self.user is not None:\n            token = kwargs['token']\n            if token == INTERNAL_RESET_URL_TOKEN:\n                session_token = self.request.session.get(INTERNAL_RESET_SESSION_TOKEN)\n                if self.token_generator.check_token(self.user, session_token):\n                    # If the token is valid, display the password reset form.\n                    self.validlink = True\n                    return super(PasswordResetConfirmView, self).dispatch(*args, **kwargs)\n            else:\n                if self.token_generator.check_token(self.user, token):\n                    # Store the token in the session and redirect to the\n                    # password reset form at a URL without the token. That\n                    # avoids the possibility of leaking the token in the\n                    # HTTP Referer header.\n                    self.request.session[INTERNAL_RESET_SESSION_TOKEN] = token\n                    redirect_url = self.request.path.replace(token, INTERNAL_RESET_URL_TOKEN)\n                    return HttpResponseRedirect(redirect_url)\n\n        # Display the \"Password reset unsuccessful\" page.\n        return self.render_to_response(self.get_context_data())\n\n    def get_user(self, uidb64):\n        try:\n            # urlsafe_base64_decode() decodes to bytestring on Python 3\n            uid = force_text(urlsafe_base64_decode(uidb64))\n            user = UserModel._default_manager.get(pk=uid)\n        except (TypeError, ValueError, OverflowError, UserModel.DoesNotExist):\n            user = None\n        return user\n\n    def get_form_kwargs(self):\n        kwargs = super(PasswordResetConfirmView, self).get_form_kwargs()\n        kwargs['user'] = self.user\n        return kwargs\n\n    def form_valid(self, form):\n        user = form.save()\n        del self.request.session[INTERNAL_RESET_SESSION_TOKEN]\n        if self.post_reset_login:\n            auth_login(self.request, user, self.post_reset_login_backend)\n        return super(PasswordResetConfirmView, self).form_valid(form)\n\n    def get_context_data(self, **kwargs):\n        context = super(PasswordResetConfirmView, self).get_context_data(**kwargs)\n        if self.validlink:\n            context['validlink'] = True\n        else:\n            context.update({\n                'form': None,\n                'title': _('Password reset unsuccessful'),\n                'validlink': False,\n            })\n        return context\n\n\nclass PasswordResetCompleteView(PasswordContextMixin, TemplateView):\n    template_name = 'registration/password_reset_complete.html'\n    title = _('Password reset complete')\n\n    def get_context_data(self, **kwargs):\n        context = super(PasswordResetCompleteView, self).get_context_data(**kwargs)\n        context['login_url'] = resolve_url(settings.LOGIN_URL)\n        return context\n\n\n@sensitive_post_parameters()\n@csrf_protect\n@login_required\n@deprecate_current_app\ndef password_change(request,\n                    template_name='registration/password_change_form.html',\n                    post_change_redirect=None,\n                    password_change_form=PasswordChangeForm,\n                    extra_context=None):\n    warnings.warn(\"The password_change() view is superseded by the \"\n                  \"class-based PasswordChangeView().\",\n                  RemovedInDjango21Warning, stacklevel=2)\n    if post_change_redirect is None:\n        post_change_redirect = reverse('password_change_done')\n    else:\n        post_change_redirect = resolve_url(post_change_redirect)\n    if request.method == \"POST\":\n        form = password_change_form(user=request.user, data=request.POST)\n        if form.is_valid():\n            form.save()\n            # Updating the password logs out all other sessions for the user\n            # except the current one.\n            update_session_auth_hash(request, form.user)\n            return HttpResponseRedirect(post_change_redirect)\n    else:\n        form = password_change_form(user=request.user)\n    context = {\n        'form': form,\n        'title': _('Password change'),\n    }\n    if extra_context is not None:\n        context.update(extra_context)\n\n    return TemplateResponse(request, template_name, context)\n\n\n@login_required\n@deprecate_current_app\ndef password_change_done(request,\n                         template_name='registration/password_change_done.html',\n                         extra_context=None):\n    warnings.warn(\"The password_change_done() view is superseded by the \"\n                  \"class-based PasswordChangeDoneView().\",\n                  RemovedInDjango21Warning, stacklevel=2)\n    context = {\n        'title': _('Password change successful'),\n    }\n    if extra_context is not None:\n        context.update(extra_context)\n\n    return TemplateResponse(request, template_name, context)\n\n\nclass PasswordChangeView(PasswordContextMixin, FormView):\n    form_class = PasswordChangeForm\n    success_url = reverse_lazy('password_change_done')\n    template_name = 'registration/password_change_form.html'\n    title = _('Password change')\n\n    @method_decorator(sensitive_post_parameters())\n    @method_decorator(csrf_protect)\n    @method_decorator(login_required)\n    def dispatch(self, *args, **kwargs):\n        return super(PasswordChangeView, self).dispatch(*args, **kwargs)\n\n    def get_form_kwargs(self):\n        kwargs = super(PasswordChangeView, self).get_form_kwargs()\n        kwargs['user'] = self.request.user\n        return kwargs\n\n    def form_valid(self, form):\n        form.save()\n        # Updating the password logs out all other sessions for the user\n        # except the current one.\n        update_session_auth_hash(self.request, form.user)\n        return super(PasswordChangeView, self).form_valid(form)\n\n\nclass PasswordChangeDoneView(PasswordContextMixin, TemplateView):\n    template_name = 'registration/password_change_done.html'\n    title = _('Password change successful')\n\n    @method_decorator(login_required)\n    def dispatch(self, *args, **kwargs):\n        return super(PasswordChangeDoneView, self).dispatch(*args, **kwargs)\n",
+			"file": "Lib/site-packages/django/contrib/auth/views.py",
+			"file_size": 23151,
+			"file_write_time": 131580634372027581,
+			"settings":
+			{
+				"buffer_size": 23150,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "src/templates/registration/login.html",
+			"settings":
+			{
+				"buffer_size": 666,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "src/restaurants/views.py",
+			"settings":
+			{
+				"buffer_size": 2506,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "src/cfehome/settings/base.py",
+			"settings":
+			{
+				"buffer_size": 3221,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "src/restaurants/templates/restaurants/restaurants_list.html",
+			"settings":
+			{
+				"buffer_size": 553,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "src/restaurants/models.py",
+			"settings":
+			{
+				"buffer_size": 1317,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "src/cfehome/settings/production.py",
+			"settings":
+			{
+				"buffer_size": 3137,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "src/templates/contact.html",
+			"settings":
+			{
+				"buffer_size": 117,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"contents": "<!doctype html>\n<html lang=en>\n<head>\n</head>\n{% include \"snippets/css.html\" %}\n<body>\n\n{% include \"snippets/nav.html\" %}\n<div class=\"container\">\n	{% block content %}\n	{% endblock %}\n</div>\n</body>\n\n{% include \"snippets/js.html\" %}\n</html>",
+			"file": "src/templates/base.html",
+			"file_size": 254,
+			"file_write_time": 131553215219026552,
+			"settings":
+			{
+				"buffer_size": 239,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "src/restaurants/templates/restaurants/form.html",
+			"settings":
+			{
+				"buffer_size": 181,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"contents": "from django import forms\n\nfrom .models import RestaurantLocation\nfrom .validators import validate_category\n\nclass RestaurantLocationCreateForm(forms.ModelForm):\n    \n    category = forms.CharField(required=False,validators=[validate_category])\n    class Meta:\n        model = RestaurantLocation\n        fields = [\n            'name',\n            'location',\n            'category',\n        ]\n\n    ",
+			"file": "src/restaurants/forms.py",
+			"file_size": 395,
+			"file_write_time": 131588294820891182,
+			"settings":
+			{
+				"buffer_size": 397,
+				"line_ending": "Windows"
+			}
+		}
+	],
+	"build_system": "",
+	"build_system_choices":
+	[
+	],
+	"build_varint": "",
+	"command_palette":
+	{
+		"height": 409.0,
+		"last_filter": "java",
+		"selected_items":
+		[
+			[
+				"java",
+				"Build With: JavaC"
+			]
+		],
+		"width": 490.0
+	},
+	"console":
+	{
+		"height": 0.0,
+		"history":
+		[
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"expanded_folders":
+	[
+		"/C/django/cfehome",
+		"/C/django/cfehome/src",
+		"/C/django/cfehome/src/cfehome",
+		"/C/django/cfehome/src/restaurants",
+		"/C/django/cfehome/src/templates",
+		"/C/django/cfehome/src/templates/registration"
+	],
+	"file_history":
+	[
+		"/C/Program Files/Git/mingw64/share/doc/git-doc/git-push.html",
+		"/C/django/cfehome/src/cfehome/settings/local.py",
+		"/C/django/cfehome/Lib/site-packages/django/contrib/auth/apps.py",
+		"/C/Program Files/Git/ReleaseNotes.html",
+		"/C/django/cfehome/src/restaurants/admin.py",
+		"/C/django/cfehome/src/restaurants/utils.py",
+		"/C/flask/flask-introduction/Scripts/flask.exe",
+		"/C/django/cfehome/src/restaurants/templates/restaurants/restaurantlocation_detail.html",
+		"/C/django/cfehome/src/restaurants/templates/restaurants/restaurants_list.html",
+		"/C/django/cfehome/src/templates/snippets/nav.html",
+		"/C/django/cfehome/src/templates/home.html",
+		"/C/django/cfehome/src/templates/contact.html",
+		"/C/django/cfehome/src/templates/about.html",
+		"/C/Users/yash/Desktop/sds.html",
+		"/C/Users/yash/Desktop/itlab/itlab/7fibonaaci.html",
+		"/C/Users/yash/Desktop/itlab/itlab/2srt-resume.html",
+		"/C/Users/yash/Desktop/itlab/itlab/14distance.html",
+		"/C/Users/yash/Desktop/itlab/itlab/9dashes.html",
+		"/C/Users/yash/Desktop/itlab/itlab/13gcd.html",
+		"/C/Users/yash/Desktop/itlab/itlab/6enquire.php",
+		"/C/django/cfehome/src/restaurants/validators.py",
+		"/C/Users/yash/Desktop/itlab/itlab/4redirect.html",
+		"/C/Users/yash/Desktop/itlab/itlab/3solar.html",
+		"/C/Users/yash/Desktop/itlab/itlab/5filter.html",
+		"/C/Users/yash/Desktop/itlab/itlab/1map.html",
+		"/C/Users/yash/Desktop/itlab/itlab/html_form_send.php",
+		"/C/Users/yash/Desktop/itlab/itlab/Solar System/solarsystem.html",
+		"/C/Users/yash/Desktop/itlab/itlab/10stringtoggle.html",
+		"/C/Users/yash/Desktop/itlab/itlab/11pattern.html",
+		"/C/Users/yash/Desktop/itlab/itlab/12monthname.html",
+		"/C/Users/yash/Desktop/itlab/itlab/8arraysum.html",
+		"/C/django/cfehome/src/cfehome/urls.py",
+		"/C/django/cfehome/src/templates/base.html",
+		"/C/django/cfehome/src/templates/snippets/css.html",
+		"/C/django/cfehome/src/templates/snippets/js.html",
+		"/C/django/cfehome/src/templates/snippets/sidebar.html",
+		"/C/django/cfehome/src/cfehome/settings/base.py",
+		"/C/django/cfehome/src/cfehome/settings/__init__.py",
+		"/C/django/cfehome/src/cfehome/settings/production.py",
+		"/C/django/cfehome/src/muypicky/settings/__init__.py",
+		"/C/django/cfehome/src/muypicky/settings/base.py",
+		"/C/django/cfehome/src/muypicky/old_settings.py",
+		"/C/django/cfehome/src/muypicky/settings/production.py",
+		"/C/django/cfehome/src/muypicky/settings/local.py",
+		"/C/xampp/htdocs/try4/products.php",
+		"/C/xampp/htdocs/mittal/slideshow.php",
+		"/C/xampp/htdocs/try4/index.php",
+		"/C/xampp/htdocs/try4/insert.php",
+		"/C/xampp/htdocs/try4/register.php",
+		"/C/xampp/htdocs/try4/login.php",
+		"/C/xampp/htdocs/try4/verify.php",
+		"/C/xampp/htdocs/try4/about.php",
+		"/C/xampp/htdocs/ie117/patient_info.php",
+		"/C/xampp/htdocs/ie117/index.php",
+		"/C/xampp/htdocs/try4/account.php",
+		"/C/xampp/htdocs/try4/contact.php",
+		"/C/xampp/htdocs/try4/orders.php",
+		"/C/xampp/htdocs/try4/cart.php",
+		"/C/xampp/htdocs/try4/config.php",
+		"/C/xampp/htdocs/try4/slideshow.php",
+		"/C/xampp/htdocs/try4/orders-update.php",
+		"/C/xampp/htdocs/ie117/slideshow.php",
+		"/C/xampp/htdocs/try5/config.php",
+		"/C/xampp/htdocs/try2/index.php",
+		"/C/xampp/htdocs/try2/config.php",
+		"/C/xampp/htdocs/try2/setup.php",
+		"/C/xampp/htdocs/try2/login_script.php",
+		"/C/xampp/htdocs/try1/db/schoolmanagementsystemdb.sql",
+		"/C/xampp/htdocs/try2/README.md",
+		"/C/xampp/htdocs/ie117/payment.php",
+		"/C/xampp/htdocs/ie117/success.php",
+		"/C/xampp/htdocs/ie117/add_patient.php",
+		"/C/xampp/htdocs/ie117/nav-bar.php",
+		"/C/xampp/htdocs/ie117/hms-staff.php",
+		"/C/xampp/htdocs/ie117/admin_home.php",
+		"/C/xampp/htdocs/ie117/header.php",
+		"/C/xampp/htdocs/ie117/footer.php",
+		"/C/xampp/htdocs/ie117/update_info.php",
+		"/C/xampp/htdocs/ie117/library.php",
+		"/C/xampp/htdocs/ie117/all_appointments.php",
+		"/C/Users/yash/Desktop/MDB-Free/index.html",
+		"/C/Users/yash/Desktop/it practise/convert.html",
+		"/C/Users/yash/Desktop/it practise/confirm box.html",
+		"/C/Users/yash/Desktop/java applets/app1.html",
+		"/C/Users/yash/Desktop/DEE.java",
+		"/C/Users/yash/Desktop/codes/seg tree/level operate.txt",
+		"/C/xampp/htdocs/index.php",
+		"/C/Users/yash/Desktop/it practise/asdfsa.html",
+		"/C/Users/yash/Desktop/it practise/dfa.html",
+		"/C/Users/yash/Desktop/it practise/roll no validation.html",
+		"/C/Users/yash/Desktop/it practise/select.html",
+		"/C/Users/yash/Desktop/it practise/slide4.html",
+		"/C/Users/yash/Desktop/it practise/slide 2.html",
+		"/C/Users/yash/Desktop/js/example.html",
+		"/C/Users/yash/Desktop/it practise/ASD",
+		"/C/dev2/trydjango/src/muypicky/muypicky/settings/__init__.py",
+		"/C/dev2/trydjango/src/muypicky/restaurants/models.py",
+		"/C/dev2/trydjango/src/muypicky/muypicky/settings.py",
+		"/C/dev2/trydjango/src/muypicky/templates/home.html",
+		"/C/dev2/trydjango/src/muypicky/templates/base.html",
+		"/C/dev2/trydjango/src/muypicky/muypicky/urls.py",
+		"/C/dev2/trydjango/src/muypicky/restaurants/templates/restaurants/restaurants_list.html",
+		"/C/dev2/trydjango/src/muypicky/restaurants/views.py",
+		"/C/dev2/trydjango/src/muypicky/restaurants/admin.py",
+		"/C/dev2/trydjango/src/muypicky/templates/about.html",
+		"/C/dev2/trydjango/src/muypicky/templates/contacts.html",
+		"/C/dev2/trydjango/src/muypicky/templates/snippets/css.html",
+		"/C/dev2/trydjango/src/muypicky/muypicky/settings/local.py",
+		"/C/dev2/trydjango/src/muypicky/templates/snippets/sidebar.html",
+		"/C/dev2/trydjango/src/muypicky/templates/snippets/nav.html",
+		"/C/dev2/trydjango/src/muypicky/templates/snippets/js.html",
+		"/C/dev2/trydjango/src/muypicky/muypicky/new_settings/base.py",
+		"/C/dev2/trydjango/src/muypicky/muypicky/settings/base.py",
+		"/C/dev2/trydjango/src/muypicky/muypicky/settings/production.py"
+	],
+	"find":
+	{
+		"height": 39.0
+	},
+	"find_in_files":
+	{
+		"height": 0.0,
+		"where_history":
+		[
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"wind",
+			"ale",
+			"info",
+			"indo",
+			"change",
+			"images",
+			"sql",
+			"slide",
+			"UPDATE `appointments` SET `payment_amount` = '0', `case_closed` = 'no' WHERE appointment_no` = 60",
+			"submi",
+			"sunrise",
+			"Sunrise",
+			"sunrise",
+			"mys",
+			"root"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"selected": 2,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "src/cfehome/urls.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1390,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Python/Python.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": -0.0,
+						"translation.y": 186.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "Lib/site-packages/django/contrib/auth/views.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 23150,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								4441,
+								4441
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Python/Python.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": -0.0,
+						"translation.y": 3348.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "src/templates/registration/login.html",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 666,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/HTML/HTML.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 278.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "src/restaurants/views.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 2506,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Python/Python.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 3,
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "src/cfehome/settings/base.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 3221,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Python/Python.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": -0.0,
+						"translation.y": 1116.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 4,
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "src/restaurants/templates/restaurants/restaurants_list.html",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 553,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/HTML/HTML.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 8,
+					"type": "text"
+				},
+				{
+					"buffer": 6,
+					"file": "src/restaurants/models.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1317,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Python/Python.tmLanguage"
+						},
+						"translation.x": -0.0,
+						"translation.y": 186.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 5,
+					"type": "text"
+				},
+				{
+					"buffer": 7,
+					"file": "src/cfehome/settings/production.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 3137,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1107,
+								1107
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Python/Python.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 1488.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 7,
+					"type": "text"
+				},
+				{
+					"buffer": 8,
+					"file": "src/templates/contact.html",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 117,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								117,
+								117
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/HTML/HTML.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 11,
+					"type": "text"
+				},
+				{
+					"buffer": 9,
+					"file": "src/templates/base.html",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 239,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								147,
+								182
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/HTML/HTML.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 10,
+					"type": "text"
+				},
+				{
+					"buffer": 10,
+					"file": "src/restaurants/templates/restaurants/form.html",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 181,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/HTML/HTML.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 6,
+					"type": "text"
+				},
+				{
+					"buffer": 11,
+					"file": "src/restaurants/forms.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 397,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								397,
+								397
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Python/Python.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 9,
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 39.0
+	},
+	"input":
+	{
+		"height": 38.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.exec":
+	{
+		"height": 196.0
+	},
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"pinned_build_system": "",
+	"project": "muypicky.sublime-project",
+	"replace":
+	{
+		"height": 74.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 625.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 475.0
+	},
+	"select_symbol":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"selected_group": 0,
+	"settings":
+	{
+	},
+	"show_minimap": true,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 320.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}
